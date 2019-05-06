@@ -1,0 +1,60 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: csi-sandstone-nfsplugin-attacher
+  labels:
+    app: csi-sandstone-nfsplugin-attacher
+spec:
+  selector:
+    app: csi-sandstone-nfsplugin-attacher
+  ports:
+    - name: dummy
+      port: 12345
+---
+kind: StatefulSet
+apiVersion: apps/v1beta1
+metadata:
+  name: csi-sandstone-nfsplugin-attacher
+spec:
+  serviceName: "csi-sandstone-nfsplugin-attacher"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: csi-sandstone-nfsplugin-attacher
+    spec:
+      serviceAccount: csi-attacher
+      containers:
+        - name: csi-attacher
+          image: quay.io/k8scsi/csi-attacher:v1.0.0
+          args:
+            - "--v=5"
+            - "--csi-address=$(ADDRESS)"
+          env:
+            - name: ADDRESS
+              value: /var/lib/kubelet/plugins/sandstone-csi-nfsplugin/csi.sock
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - name: socket-dir
+              mountPath: /var/lib/kubelet/plugins/sandstone-csi-nfsplugin
+
+        - name: sandstone-nfsplugin
+          image: szsandstone/sandstone-nfsplugin:v1.0.0
+          args :
+            - "--nodeid=$(NODE_ID)"
+            - "--endpoint=$(CSI_ENDPOINT)"
+            - "--v=5"
+          env:
+            - name: NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: CSI_ENDPOINT
+              value: unix://plugin/csi.sock
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - name: socket-dir
+              mountPath: /plugin
+      volumes:
+        - name: socket-dir
+          emptyDir:
