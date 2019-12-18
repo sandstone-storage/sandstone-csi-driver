@@ -1,6 +1,6 @@
 # SandStone CSI 1.0.0
 
-[Container Storage Interface (CSI)](https://github.com/container-storage-interface/) driver, provisioner, and attacher for SandStone NFS.
+[Container Storage Interface (CSI)](https://github.com/container-storage-interface/) driver, provisioner, and attacher for SandStone Block/NFS/ISCSI.
 
 ## Overview
 
@@ -13,7 +13,7 @@ For example usage of this NFS CSI plugins, see examples below.
 
 Before to go,  you should have installed [SandStone USP](http://www.szsandstone.com)
 
-You can get latest version of SandStone CSI driver at [docker hub](https://hub.docker.com/r/szsandstone/) by running docker `docker pull szsandstone/sandstone-nfsplugin `
+You can get latest version of SandStone CSI driver at [docker hub](https://hub.docker.com/r/szsandstone/) 
 
 # Deployment
 
